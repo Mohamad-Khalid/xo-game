@@ -1,16 +1,87 @@
 'use strict'
 
 // Array contains square ids to check which one has been clicked
-const ids = ['s1','s2','s3',
-              's4','s5','s6',
-              's7','s8','s9']
+const ids = ['s0','s1','s2',
+             's3','s4','s5',
+             's6','s7','s8']
 
-// Mark clicked square and put in the array marked 
 const marked = [];
+const valid = [0,1,2,3,4,5,6,7,8]
 
 let xChar = 'X'              
 let yChar = 'O'              
 let turn = true;
+
+
+let onGame = true;
+for(let i = 0 ;i<9 ;i++){
+  let square  = document.getElementById(ids[i]);
+  square.onclick = function(){
+    if(!marked.includes(i)){  
+      square.textContent = (turn? xChar : yChar);
+      turn= !turn;
+      marked.push(i);
+      valid.splice(valid.indexOf(i),1);
+       if(winStatus(i,square.textContent)){
+        return;
+       }
+
+      // program turn | setTimeout --> to delay for a time 
+      setTimeout(function(){
+      let proSquare = valid[(Math.floor(Math.random()*100))%valid.length];
+      // console.log(proSquare)
+      let progrmPress = document.getElementById(ids[proSquare]);
+      progrmPress.textContent = (turn? xChar : yChar);
+      turn= !turn;
+      marked.push(proSquare);
+      valid.splice(valid.indexOf(proSquare),1);
+       // win
+       if(winStatus(proSquare,progrmPress.textContent)){
+        return;
+       }
+      }, 400);  
+      
+    }
+  }
+}
+
+
+
+
+//---------------------------------------------
+
+function winStatus(cell , char ){
+  // check if the player won
+  let win = checkIfWin(cell,char);
+  if(win){
+    for(let i=0 ;i<9 ;i++){
+      if(!marked.includes(i))
+        marked.push(i)
+    }
+
+    let prg = document.getElementById('prg');
+    prg.textContent = char + ' is the winner';
+    playAgain()
+  }
+   // if there is no winner 
+   if(!win && marked.length==9){
+     prg.textContent ='No winner';
+     playAgain() 
+   }
+   return win;
+}
+
+
+function playAgain(){
+  let playAgain = document.getElementById('btn');
+  playAgain.style.visibility = 'visible';  
+  playAgain.onclick = function(){
+    window.location.reload();
+    // setTimeout(function(){window.location.reload();}, 0);  
+  }   
+}
+
+
 
 // check the row , col , and digonals
 function checkIfWin(cell , char){
@@ -97,43 +168,3 @@ function checkIfWin(cell , char){
   
   return  winRow || winCol  || winDig1 || winDig2;
 }
-
-
-function playAgain(){
-  let playAgain = document.getElementById('btn');
-  playAgain.style.visibility = 'visible';  
-  playAgain.onclick = function(){
-    window.location.reload();
-    // setTimeout(function(){window.location.reload();}, 0);  
-  }   
-}
-
-for(let i=0 ; i<9 ;i++){
-  let x = document.getElementById(ids[i]);
-    x.onclick = function(){
-    if(!marked.includes(i)){
-      x.textContent = (turn==true? xChar : yChar);
-      turn = !turn;
-      marked.push(i);
-      // check if the player won
-      let win = checkIfWin(i,x.textContent);
-      if(win){
-        for(let i=0 ;i<9 ;i++){
-          if(!marked.includes(i))
-            marked.push(i)
-        }
-
-        let prg = document.getElementById('prg');
-        prg.textContent = x.textContent + ' is the winner';
-        playAgain()
-      }
-      // if there is no winner 
-      if(!win && marked.length==9){
-        prg.textContent ='No winner';
-        playAgain() 
-      }
-    } 
-  } 
-}
-
-
